@@ -8,7 +8,7 @@ class Note:
 '''
 
 
-class Note:
+class Note(models.Model):
     title = models.CharField(max_length=255)
     content = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
