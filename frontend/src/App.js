@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
+import Note from './components/Note';
 
 const baseURL = 'http://localhost:8000';
 
@@ -8,6 +9,66 @@ function App() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [posts, setPosts] = useState([]);
+
+  const createNote = async event => {
+    event.preventDefault();
+
+    const new_request = new Request(`${baseURL}/posts/`, {
+      body: JSON.stringify({ title, content }),
+      headers: {
+        'Content-Type': 'Application/Json',
+      },
+      method: 'POST',
+    });
+
+    const response = await fetch(new_request);
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log(data);
+    } else {
+      console.log('Failed Network Request');
+    }
+
+    setTitle('');
+    setContent('');
+
+    setModalVisible(false);
+
+    getAllPosts();
+  };
+
+  const getAllPosts = async () => {
+    const response = await fetch(`${baseURL}/posts/`);
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log(data);
+      setPosts(data);
+    } else {
+      console.log('Failed Network Request');
+    }
+  };
+
+  useEffect(() => {
+    getAllPosts();
+  }, []);
+
+  const deleteItem = async noteId => {
+    console.log(noteId);
+
+    const response = await fetch(`${baseURL}/posts/${noteId}/`, {
+      method: 'DELETE',
+    });
+
+    if (response.ok) {
+      console.log(response.status);
+    }
+
+    getAllPosts();
+  };
 
   return (
     <div>
